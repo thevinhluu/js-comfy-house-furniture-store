@@ -1,5 +1,4 @@
 // variables
-
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
 const clearCartBtn = document.querySelector('.clear-cart');
@@ -9,6 +8,7 @@ const cartItems = document.querySelector('.cart-items');
 const cartTotal = document.querySelector('.cart-total');
 const cartContent = document.querySelector('.cart-content');
 const productsDOM = document.querySelector('.products-center');
+
 // cart
 let cart = [];
 
@@ -44,7 +44,9 @@ class UI {
 				<div class="img-container">
 					<img src=${product.image} alt="product" class="product-img"/>
 					<button class="bag-btn" data-id=${product.id}>
-						<i class="fas fa-shopping-cart"></i> add to bag </button>
+						<i class="fas fa-shopping-cart"></i> 
+						add to bag 
+					</button>
 				</div>
 				<h3>${product.title}</h3>
 				<h4>${product.price}</h4>
@@ -53,6 +55,24 @@ class UI {
 		`;
 		});
 		productsDOM.innerHTML = result;
+	}
+
+	getBagButtons() {
+		const buttons = [...document.querySelectorAll('.bag-btn')];
+		buttons.forEach(button => {
+			let id = button.dataset.id;
+			let inCart = cart.find(item => item.id === id);
+			if (inCart) {
+				button.innerText = 'In Cart';
+				button.disabled = true;
+			}
+			else {
+				button.addEventListener('click', event => {
+					event.target.innerText = 'In Cart';
+					event.target.disabled = true;
+				});
+			}
+		});
 	}
 }
 
@@ -68,8 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	const products = new Products();
 
 	// get all products
-	products.getProducts().then(products => {
-		ui.displayProducts(products);
-		Storage.saveProducts(products);
-	});
+	products
+		.getProducts()
+		.then(products => {
+			ui.displayProducts(products);
+			Storage.saveProducts(products);
+		})
+		.then(() => {
+			ui.getBagButtons();
+		});
 });
